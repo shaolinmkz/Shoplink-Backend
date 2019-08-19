@@ -59,3 +59,12 @@ typings/
 
 # next.js build output
 .next
+
+# exclude package.lock.json
+package-lock.json
+
+# exclude .DS_Store
+.DS_Store
+
+# exclude dist
+./dist
