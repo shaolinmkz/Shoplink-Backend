@@ -17,7 +17,7 @@ const mockConfirmEmailHash = Helpers.hashPassword('asdfghjkl;');
 const mockConfirmEmailToken = Helpers.generateTimedToken(mockConfirmEmailHash,
   60 * 60 * 2);
 
-const registrationURL = '/customer';
+const registrationURL = '/customer/register';
 const invalidEmailConfirmationURL = '/email-confirmation?email=mcemie4eva@gmail.com&token=invalidToken';
 const emailConfirmationURL = `/email-confirmation?email=mcemie4eva@gmail.com&token=${mockConfirmEmailToken}`;
 let uniqueToken;
@@ -47,7 +47,7 @@ describe('Test the registration route', () => {
       .end((req, res) => {
         const { message } = res.body;
         expect(res.status).to.equal(409);
-        expect(message).to.equal('user already exist');
+        expect(message).to.equal('User already exist');
         done(req);
       });
   });
@@ -165,7 +165,7 @@ describe('Test the email confirmation URL route', () => {
       .end((req, res) => {
         const { message } = res.body;
         expect(res.status).to.equal(400);
-        expect(message).to.equal('reactivation link has expired');
+        expect(message).to.equal('Reactivation link has expired');
         done(req);
       });
   });
@@ -177,7 +177,7 @@ describe('Test the email confirmation URL route', () => {
       .end((req, res) => {
         const { message } = res.body;
         expect(res.status).to.equal(400);
-        expect(message).to.equal('invalid reactivation link');
+        expect(message).to.equal('Invalid reactivation link');
         done(req);
       });
   });
@@ -192,7 +192,7 @@ describe('Test the email confirmation URL route', () => {
       .end((req, res) => {
         const { message } = res.body;
         expect(res.status).to.equal(200);
-        expect(message).to.equal('your email has been confirmed');
+        expect(message).to.equal('Your email has been confirmed');
         done(req);
       });
   });
@@ -207,7 +207,7 @@ describe('Test the email confirmation URL route', () => {
       .end((req, res) => {
         const { message } = res.body;
         expect(res.status).to.equal(400);
-        expect(message).to.equal('your email have been verified already');
+        expect(message).to.equal('Your email have been verified already');
         done(req);
       });
   });
@@ -222,7 +222,7 @@ describe('Test the email confirmation URL route', () => {
       .end((req, res) => {
         const { message } = res.body;
         expect(res.status).to.equal(404);
-        expect(message).to.equal('user not found');
+        expect(message).to.equal('User does not exist.');
         done(req);
       });
   });

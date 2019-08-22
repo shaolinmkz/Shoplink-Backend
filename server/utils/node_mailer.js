@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const {
   SENDER_EMAIL_ADDRESS,
@@ -15,15 +18,13 @@ class NodeMailerService {
    * @returns {undefined}
    */
   static sendEmail(mailOptions) {
-    const transporter = nodemailer.createTransport({
+    nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: SENDER_EMAIL_ADDRESS,
         pass: SENDER_PASSWORD,
       }
-    });
-
-    transporter.sendMail(mailOptions);
+    }).sendMail(mailOptions);
   }
 }
 

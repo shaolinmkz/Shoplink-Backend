@@ -69,7 +69,6 @@ export default {
     phone1: {
       type: Sequelize.STRING,
       allowNull: true,
-      unique: true,
       defaultValue: 'n/a',
     },
     phone2: {

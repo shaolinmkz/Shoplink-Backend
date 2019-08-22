@@ -1,30 +1,51 @@
-import db from '../database/models';
 import { Response, Helpers } from '../utils';
+import { FindOneOrAll } from '../services';
 
-const { User } = db;
+const { verifyToken, decryptHash } = Helpers;
+const { findOne } = FindOneOrAll;
 
 /**
  * @class ValidateUser
  * @description Class for user validation
  */
-class ValidateUser {
+export default class ValidateUser {
   /**
-   * @method isUnique
-   * @description function for determining if user is unique
-   * @param {string} field - database field
-   * @param {string} value - value to check for
+   * @method verifyUser
+   * @description function to verify a users token
+   * @param {object} req - the request object
+   * @param {object} res - the reponse object
+   * @param {function} next the next middleware
    * @returns {boolean} whether the user is unique or not
    */
-  static async isUnique(field, value) {
-    let user;
+  static verifyToken(req, res, next) {
+    const token = req.headers.authorization || req.query.token;
+    const validToken = verifyToken(token);
+    if (!validToken) {
+      return Response.error({ req, res, statusCode: 400, data: { message: 'Reactivation link has expired' } });
+    }
+    req.decoded = validToken;
+    return next();
+  }
+
+  /**
+   * @method validateUser
+   * @description function to validate a user exist
+   * @param {object} req - the request Object
+   * @param {object} res - the response Object
+   * @param {function} next - the next middleware
+   * @returns {boolean} whether the user is unique and exist
+   */
+  static async validateUser(req, res, next) {
+    const { body } = req;
+    const params = { email: body.email };
     try {
-      const singleUser = await User.findOne({ where: { [field]: value } });
-      if (singleUser) {
-        user = singleUser;
+      const checkUser = await findOne('User', params);
+      if (checkUser) {
+        req.user = checkUser.dataValues;
       }
-      return user;
-    } catch (err) {
-      return true;
+      next();
+    } catch (error) {
+      return Response.error({ req, res, statusCode: 500, data: { error } });
     }
   }
 
@@ -37,18 +58,33 @@ class ValidateUser {
    * @returns {undefined}
    */
   static async existingUser(req, res, next) {
-    const user = await ValidateUser.isUnique('email', req.body.email);
+    const { user } = req;
 
     if (user) {
-      Response.error({
-        req,
+      return Response.error({ req,
         res,
         statusCode: 409,
-        data: { message: 'user already exist' }
+        data: { message: 'User already exist' }
       });
-    } else {
-      next();
     }
+    return next();
+  }
+
+  /**
+   * @method validateLogin
+   * @description validate user credentials
+   * @param {object} req - request object
+   * @param {object} res - response object
+   * @param {function} next - the next middleware
+   * @returns {undefined}
+   */
+  static validateLogin(req, res, next) {
+    if (!req.user) return Response.error({ req, res, statusCode: 401, data: { message: 'User does not exist.' } });
+    const loginUser = req.user;
+    const isPasswordCorrect = decryptHash(req.body.password, loginUser.password);
+    if (isPasswordCorrect) {
+      next();
+    } else Response.error({ req, res, statusCode: 401, data: { message: 'Wrong email or password.' } });
   }
 
   /**
@@ -60,22 +96,16 @@ class ValidateUser {
    * @return {undefined}
    */
   static async validateEmailConfirmationURL(req, res, next) {
-    const { email, token } = req.query;
+    const { query: { email }, decoded } = req;
     let hasError = false;
-    const decoded = await Helpers.verifyToken(token);
 
-    if (!decoded) {
-      return Response.success({ req, res, statusCode: 400, data: { message: 'reactivation link has expired' } });
-    }
-    const user = await User.findOne({
-      where: { email }
-    });
+    const user = await findOne('User', { email });
 
     if (user) {
       hasError = ValidateUser.validateEmailConfirmationHash({ req, res, user, decoded });
     } else {
       hasError = true;
-      Response.error({ req, res, statusCode: 404, data: { message: 'user not found' } });
+      Response.error({ req, res, statusCode: 404, data: { message: 'User does not exist.' } });
     }
 
     if (!hasError) {
@@ -94,19 +124,17 @@ class ValidateUser {
    * @returns {undefined}
    */
   static validateEmailConfirmationHash({ req, res, user, decoded }) {
-    const isValidToken = Helpers.decryptHash(user.uniqueToken, decoded);
+    const isValidToken = decryptHash(user.uniqueToken, decoded);
     let error = false;
     if (!isValidToken) {
-      Response.error({ req, res, statusCode: 400, data: { message: 'invalid reactivation link' } });
+      Response.error({ req, res, statusCode: 400, data: { message: 'Invalid reactivation link' } });
       error = true;
     }
 
     if (user.isEmailVerified && !error) {
-      Response.error({ req, res, statusCode: 400, data: { message: 'your email have been verified already' } });
+      Response.error({ req, res, statusCode: 400, data: { message: 'Your email have been verified already' } });
       error = true;
     }
     return error;
   }
 }
-
-export default ValidateUser;

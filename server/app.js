@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import logger from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
 import routes from './routes';
 
 const apiVersion = '/api/v1';
@@ -13,6 +14,9 @@ dotenv.config();
 // Set up the express app
 const app = express();
 
+// Enable Helmet
+app.use(helmet());
+
 // Enable CORS
 app.use(cors());
 
@@ -21,8 +25,8 @@ app.use(logger('dev'));
 
 // Parse incoming requests data
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.text());
 app.use(bodyParser.json({ type: 'application/json' }));
+app.use(bodyParser.text());
 
 // Routes
 app.use(apiVersion, routes);
@@ -33,6 +37,8 @@ app.use(routes);
 // Set Port
 const port = process.env.PORT;
 
-app.listen(port);
+const { log } = console;
+
+app.listen(port, () => log('Server running on port', port));
 
 export default app;
