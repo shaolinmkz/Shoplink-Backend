@@ -5,7 +5,6 @@ dotenv.config();
 
 const defaultProfileImage = process.env.DEFAULT_PROFILE_IMAGE;
 
-
 export default {
   up: (queryInterface, Sequelize) => queryInterface.createTable('Users', {
     id: {

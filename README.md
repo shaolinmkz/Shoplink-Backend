@@ -29,7 +29,7 @@ To run this project you would need to have installed:
 
 To run:
 ```
-$ git clone https://github.com/shaolinmkz/Shoplink-Backend..git
+$ git clone https://github.com/shaolinmkz/Shoplink-Backend.git
 $ cd Shoplink-Backend
 $ sudo npm install nodemon
 $ npm install
