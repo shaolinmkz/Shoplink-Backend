@@ -3,25 +3,29 @@ language: node_js
 node_js:
   - "stable"
 
-env:
-  global:
-    - CC_TEST_REPORTER_ID=d4b4359e46ad47070bed8ffd6391e1e18870770a8f280f3773969f690f79199a
+services:
+  - postgresql
 
 cache:
   directories:
     - "node_modules"
-  
-script:
-  - npm test
-  - npm run coveralls
-
-notifications:
-  slack: andela:LX8VPRMaSP4tskr94puPVmFf
 
 before_script:
+  - psql -c 'create database shoplink;' -U postgres
+  - npm i nyc --save-dev
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 
+script:
+  - nyc --reporter=lcov --reporter=text-lcov npm test
+  - npm run coveralls
+
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+after_fail: npm run coverage
+
+notifications:
+  slack: andela:LX8VPRMaSP4tskr94puPVmFf
+

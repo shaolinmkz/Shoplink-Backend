@@ -1,14 +1,23 @@
 {
   "name": "shoplink-backend",
   "version": "1.0.0",
-  "description": "A generic shopping site",
-  "main": "index.js",
+  "description": "A generic shopping app",
+  "main": "app.js",
   "scripts": {
     "start": "node ./dist/app.js",
     "dev": "nodemon --exec babel-node ./server/app.js",
-    "test": "nyc --reporter=html --reporter=text mocha --require @babel/polyfill --require @babel/register ./test/index.js --timeout 10000 --exit",
+    "test": "npm run reset:db && nyc --reporter=html --reporter=text mocha --require @babel/polyfill --require @babel/register ./test/index.spec.js --timeout 10000 --exit",
     "lint": "eslint ./server --fix",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "sequelize": "./node_modules/.bin/babel-node ./node_modules/.bin/sequelize $*",
+    "migrate": "./node_modules/.bin/babel-node ./node_modules/.bin/sequelize db:migrate",
+    "reset:seeds": "npm run sequelize db:seed:undo:all && npm run sequelize db:seed:all",
+    "reset:migration": "npm run sequelize db:migrate:undo:all && npm run sequelize db:migrate",
+    "reset:db": "npm run reset:migration && npm run reset:seeds",
+    "start:dev": "npm run reset:db && npm run dev",
+    "build": "npm run reset:db && rm -rf dist && mkdir dist && babel -d ./dist ./server -s",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run build",
+    "coverage": "nyc --reporter=html --reporter=text --reporter=lcov mocha --reporter spec --require babel-register ./test/*.js --exit"
   },
   "repository": {
     "type": "git",
@@ -27,23 +36,26 @@
     }
   },
   "dependencies": {
-    "@babel/preset-env": "^7.3.4",
-    "@babel/register": "^7.0.0",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
     "@babel/node": "^7.2.2",
     "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "dotenv": "^6.0.0",
     "express": "^4.16.4",
+    "express-validator": "^6.1.1",
     "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.9.1",
+    "nodemailer": "^6.3.0",
     "pg": "^7.8.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.0.0",
     "sequelize-cli": "^5.4.0",
-    "morgan": "^1.9.1"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.2",
@@ -60,7 +72,7 @@
     "nodemon": "^1.18.10",
     "nyc": "^14.1.1"
   },
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/shaolinmkz/Shoplink-Backend/issues"
   },
