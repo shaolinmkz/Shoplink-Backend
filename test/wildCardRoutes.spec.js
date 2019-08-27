@@ -28,7 +28,7 @@ describe('Test the wild card routes ', () => {
         const { method, message, status } = res.body;
         expect(res.status).to.equal(404);
         expect(method).to.equal('POST');
-        expect(status).to.equal('success');
+        expect(status).to.equal('error');
         expect(message).to.equal("Oops! What your looking for isn't here");
         done(req);
       });

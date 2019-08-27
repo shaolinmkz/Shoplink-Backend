@@ -20,15 +20,14 @@ app.use(cors());
 app.use(logger('dev'));
 
 // Parse incoming requests data
-app.use(bodyParser.json());
-
-// catch index
-app.use(routes);
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.text());
+app.use(bodyParser.json({ type: 'application/json' }));
 
 // Routes
 app.use(apiVersion, routes);
 
-// catch all
+// catch index and catch all null routes
 app.use(routes);
 
 // Set Port
