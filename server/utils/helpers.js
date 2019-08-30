@@ -1,6 +1,8 @@
 import jsonWebToken from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import NodeMailerService from './node_mailer';
+import confirmEmailMarkup from './markUp/emailComfirmationMarkup';
 
 dotenv.config();
 
@@ -11,7 +13,7 @@ const { SECRET_KEY } = process.env;
  * @description Specifies reusable helper methods
  * @exports Helpers
  */
-class Helpers {
+export default class Helpers {
   /**
    * @method generateTimedToken
    * @description Generate a timed token
@@ -33,7 +35,7 @@ class Helpers {
    */
   static verifyToken(token) {
     let payload;
-    jsonWebToken.verify(token, SECRET_KEY, async (error, decoded) => {
+    jsonWebToken.verify(token, SECRET_KEY, (error, decoded) => {
       payload = '';
       if (!error) {
         payload = decoded.payload;
@@ -73,6 +75,50 @@ class Helpers {
   static setEnvironmentVariable(key, value) {
     if (process.env.TEST_ENV) process.env[key] = value;
   }
-}
 
-export default Helpers;
+  /**
+   * @method sendConfirmatonMail
+   * @description Send a confirmation mail
+   * @param {object} data
+   * @returns {undefined}
+   */
+  static sendConfirmatonMail({ firstName, lastName, email, uniqueToken }) {
+    const fullName = `${firstName} ${lastName}`;
+    const expiryTime = 60 * 60 * 2; // 2 days
+    const hashedToken = Helpers.hashPassword(uniqueToken);
+    const timedToken = Helpers.generateTimedToken(hashedToken, expiryTime);
+    const mailOptions = {
+      from: 'ShopLink🔗 <email-confirmation@shoplink.com>',
+      to: email,
+      subject: 'Email Verification✓',
+      html: confirmEmailMarkup(fullName, email, timedToken)
+    };
+    NodeMailerService.sendEmail(mailOptions);
+  }
+
+  /**
+   * Abstraction of returned user details
+   * @param {Object} user user object gotten from database
+   * @param {String} token authentication token
+   * @returns {Object} parsed user object
+   */
+  static setUserDetails(user) {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      address1: user.address1,
+      address2: user.address2,
+      state: user.state,
+      lga: user.lga,
+      postalCode: user.postalCode,
+      shippingRegion: user.shippingRegion,
+      phone1: user.phone1,
+      phone2: user.phone2,
+      role: user.role,
+      profileImage: user.profileImage,
+      isEmailVerified: user.isEmailVerified,
+    };
+  }
+}

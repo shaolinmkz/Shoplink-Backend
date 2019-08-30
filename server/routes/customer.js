@@ -1,17 +1,36 @@
 import express from 'express';
 import { Users } from '../controller/index';
-import { ValidateUser, captureErrors, validateSignUpFields } from '../middleware';
+import { ValidateUser, captureErrors, nameValidator, validateEmail, validatePassword } from '../middleware';
 
 const customer = express.Router();
 
-customer.post('/customer',
-  validateSignUpFields,
+const { register, login, confirmEmail } = Users;
+
+const {
+  existingUser,
+  validateLogin,
+  validateEmailConfirmationURL,
+  validateUser,
+  verifyToken
+} = ValidateUser;
+
+customer.post('/customer/register',
+  [...nameValidator, validateEmail, validatePassword],
   captureErrors,
-  ValidateUser.existingUser,
-  Users.register);
+  validateUser,
+  existingUser,
+  register);
 
 customer.get('/email-confirmation',
-  ValidateUser.validateEmailConfirmationURL,
-  Users.confirmEmail);
+  verifyToken,
+  validateEmailConfirmationURL,
+  confirmEmail);
+
+customer.post('/customer/login',
+  [validateEmail, validatePassword],
+  captureErrors,
+  validateUser,
+  validateLogin,
+  login);
 
 export default customer;

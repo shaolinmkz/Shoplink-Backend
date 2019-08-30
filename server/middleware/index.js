@@ -1,5 +1,11 @@
 import ValidateUser from './validateUser';
 import captureErrors from './captureErrors';
-import validateSignUpFields from './validateSignUpFields';
+import nameValidator, { validateEmail, validatePassword } from './validateInputs';
 
-export { ValidateUser, captureErrors, validateSignUpFields };
+export {
+  ValidateUser,
+  captureErrors,
+  nameValidator,
+  validateEmail,
+  validatePassword
+};
