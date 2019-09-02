@@ -20,6 +20,9 @@ class NodeMailerService {
   static sendEmail(mailOptions) {
     nodemailer.createTransport({
       service: 'gmail',
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
       auth: {
         user: SENDER_EMAIL_ADDRESS,
         pass: SENDER_PASSWORD,

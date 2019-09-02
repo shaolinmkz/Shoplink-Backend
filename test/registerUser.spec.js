@@ -13,14 +13,23 @@ const mockUser = {
   password: 'mockpassword12345;'
 };
 
+const mockUser2 = {
+  firstName: 'Emeka',
+  lastName: 'Obasi',
+  email: 'mockUser2@gmail.com',
+  password: 'mockpassword12345;'
+};
+
 const mockConfirmEmailHash = Helpers.hashPassword('asdfghjkl;');
 const mockConfirmEmailToken = Helpers.generateTimedToken(mockConfirmEmailHash,
   60 * 60 * 2);
 
 const registrationURL = '/customer/register';
+const resendConfirmationEmailUrl = '/resend-confirmation-emails';
 const invalidEmailConfirmationURL = '/email-confirmation?email=mcemie4eva@gmail.com&token=invalidToken';
 const emailConfirmationURL = `/email-confirmation?email=mcemie4eva@gmail.com&token=${mockConfirmEmailToken}`;
 let uniqueToken;
+let userToken;
 
 describe('Test the registration route', () => {
   it('should register a user', (done) => {
@@ -170,7 +179,7 @@ describe('Test the email confirmation URL route', () => {
       });
   });
 
-  it("should return a 400 if the decrypted email confirmation URL token doeasn't match the Id", (done) => {
+  it("should return a 400 if the decrypted email confirmation URL token doesn't match the Id", (done) => {
     chai
       .request(app)
       .get(emailConfirmationURL)
@@ -223,6 +232,38 @@ describe('Test the email confirmation URL route', () => {
         const { message } = res.body;
         expect(res.status).to.equal(404);
         expect(message).to.equal('User does not exist.');
+        done(req);
+      });
+  });
+});
+
+describe('Resend email verification link', () => {
+  it('should register a user', (done) => {
+    chai
+      .request(app)
+      .post(registrationURL)
+      .send(mockUser2)
+      .end((req, res) => {
+        const { message, expiresIn, customer, accessToken } = res.body;
+        userToken = accessToken;
+        expect(res.status).to.equal(201);
+        expect(customer.email).to.equal(mockUser2.email);
+        expect(expiresIn).to.equal('48 hours');
+        expect(message).to.equal('user created successfully');
+        uniqueToken = process.env.UNIQUE_TOKEN;
+        done(req);
+      });
+  });
+
+  it('should send a new verification email', (done) => {
+    chai
+      .request(app)
+      .post(resendConfirmationEmailUrl)
+      .set({ authorization: userToken })
+      .end((req, res) => {
+        const { message } = res.body;
+        expect(res.status).to.equal(200);
+        expect(message).to.equal('A new verification link has been sent to your registered mail.');
         done(req);
       });
   });

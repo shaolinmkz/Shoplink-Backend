@@ -100,7 +100,7 @@ describe('Test the login route', () => {
       .send({ email: 'aaaa@gmail.com', password: 'bad_password' })
       .end((req, res) => {
         const { message } = res.body;
-        expect(res.status).to.equal(401);
+        expect(res.status).to.equal(404);
         expect(message).to.equal('User does not exist.');
         done(req);
       });
