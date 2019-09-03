@@ -24,7 +24,7 @@ export default (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     address1: {
       type: DataTypes.TEXT,
@@ -96,7 +96,12 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false
-    }
+    },
+    isSocialMediaAuth: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
+    },
   }, {});
   User.associate = () => {
     // associations can be defined here

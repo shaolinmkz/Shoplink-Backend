@@ -88,7 +88,7 @@ export default class Helpers {
     const hashedToken = Helpers.hashPassword(uniqueToken);
     const timedToken = Helpers.generateTimedToken(hashedToken, expiryTime);
     const mailOptions = {
-      from: 'ShopLink🔗 <email-confirmation@shoplink.com>',
+      from: 'ShopLink🔗 <ireporter18@gmail.com>',
       to: email,
       subject: 'Email Verification✓',
       html: confirmEmailMarkup(fullName, email, timedToken)
@@ -119,6 +119,40 @@ export default class Helpers {
       role: user.role,
       profileImage: user.profileImage,
       isEmailVerified: user.isEmailVerified,
+      isSocialMediaAuth: user.isSocialMediaAuth,
     };
+  }
+
+  /**
+   * @method extractUserDetails
+   * @description extract and format user details via facebook auth
+   * @param {object} userCredentials
+   * @returns {undefined}
+   */
+  static extractUserDetails(userCredentials) {
+    const { displayName, photos, emails } = userCredentials;
+    const nameSplit = displayName.split(' ');
+    return {
+      firstName: nameSplit[0],
+      lastName: nameSplit[nameSplit.length - 1],
+      profileImage: photos[0].value,
+      email: emails[0].value,
+    };
+  }
+
+  /**
+   * @method handleFacebookDetails
+   * @description extract and format user details via facebook auth
+   * @param {object} accessToken
+   * @param {object} refreshToken
+   * @param {object} profile
+   * @param {object} callback
+   * @returns {undefined}
+   */
+  static handleFacebookDetails(accessToken, refreshToken, profile, callback) {
+    process.nextTick(() => {
+      const { displayName, photos, emails } = profile;
+      callback(null, { data: { displayName, photos, emails } });
+    });
   }
 }

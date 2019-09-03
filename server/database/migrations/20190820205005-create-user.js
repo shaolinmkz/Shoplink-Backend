@@ -29,7 +29,7 @@ export default {
     },
     password: {
       type: Sequelize.TEXT,
-      allowNull: false
+      allowNull: true
     },
     address1: {
       type: Sequelize.TEXT,
@@ -98,6 +98,11 @@ export default {
       allowNull: false
     },
     isEmailVerified: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
+    },
+    isSocialMediaAuth: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false
