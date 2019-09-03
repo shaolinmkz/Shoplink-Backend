@@ -1,5 +1,4 @@
 import Users from './Users';
+import Departments from './Departments';
 
-const removeMe = { remove: 'me' };
-
-export { Users, removeMe };
+export { Users, Departments };
