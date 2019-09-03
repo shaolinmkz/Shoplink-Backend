@@ -4,14 +4,16 @@ import { ValidateUser, captureErrors, nameValidator, validateEmail, validatePass
 
 const customer = express.Router();
 
-const { register, login, confirmEmail } = Users;
+const { register, login, confirmEmail, resendConfirmationEmail } = Users;
 
 const {
   existingUser,
   validateLogin,
-  validateEmailConfirmationURL,
+  validateEmailConfirmationHash,
   validateUser,
-  verifyToken
+  verifyToken,
+  validateUserExists,
+  isEmailVerified,
 } = ValidateUser;
 
 customer.post('/customer/register',
@@ -23,13 +25,24 @@ customer.post('/customer/register',
 
 customer.get('/email-confirmation',
   verifyToken,
-  validateEmailConfirmationURL,
+  validateUser,
+  validateUserExists,
+  validateEmailConfirmationHash,
+  isEmailVerified,
   confirmEmail);
+
+customer.post('/resend-confirmation-emails',
+  verifyToken,
+  validateUser,
+  validateUserExists,
+  isEmailVerified,
+  resendConfirmationEmail);
 
 customer.post('/customer/login',
   [validateEmail, validatePassword],
   captureErrors,
   validateUser,
+  validateUserExists,
   validateLogin,
   login);
 

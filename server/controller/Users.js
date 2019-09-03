@@ -1,6 +1,6 @@
 import { v4 as generateId } from 'uuid';
 import { Response, Helpers } from '../utils';
-import { CreateRecord } from '../services';
+import { CreateRecord, UpdateRecord } from '../services';
 
 const {
   hashPassword,
@@ -11,6 +11,7 @@ const {
 } = Helpers;
 
 const { createRecord } = CreateRecord;
+const { updateRecord } = UpdateRecord;
 
 /**
  * @class Users
@@ -35,7 +36,7 @@ export default class Users {
       const createUser = await createRecord('User', { id, ...inputs, password: hash });
       const customer = setUserDetails(createUser);
       await sendConfirmatonMail(inputs);
-      return Response.success({ req,
+      Response.success({ req,
         res,
         statusCode: 201,
         data: {
@@ -58,7 +59,8 @@ export default class Users {
    */
   static async confirmEmail(req, res) {
     try {
-      await req.validUser.update({ isEmailVerified: true });
+      const { query: { email } } = req;
+      await updateRecord('User', { isEmailVerified: true }, { email });
       Response.success({ req,
         res,
         statusCode: 200,
@@ -70,14 +72,38 @@ export default class Users {
   }
 
   /**
+   * @description controller function that handles resending of email verification
+   * @param {object} req - request object
+   * @param {object} res - response object
+   * @return {undefined}
+   */
+  static async resendConfirmationEmail(req, res) {
+    try {
+      const { user } = req;
+      const uniqueToken = generateId();
+      setEnvironmentVariable('UNIQUE_TOKEN', uniqueToken); // for test purpose
+      const { firstName, lastName, email } = user.dataValues;
+      await updateRecord('User', { uniqueToken }, { email });
+      await sendConfirmatonMail({ firstName, lastName, email, uniqueToken });
+      Response.success({ req,
+        res,
+        statusCode: 200,
+        data: { message: 'A new verification link has been sent to your registered mail.' }
+      });
+    } catch (error) {
+      return Response.error({ req, res, statusCode: 500, data: { error } });
+    }
+  }
+
+  /**
    * @description login users with email
    * @param {object} req - request object
    * @param {object} res - response object
    * @return {undefined}
    */
   static async login(req, res) {
-    const customer = setUserDetails(req.user);
-    return Response.success({ req,
+    const customer = setUserDetails(req.user.dataValues);
+    Response.success({ req,
       res,
       statusCode: 200,
       data: {
