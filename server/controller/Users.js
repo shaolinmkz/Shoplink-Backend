@@ -102,7 +102,7 @@ export default class Users {
    * @return {undefined}
    */
   static async login(req, res) {
-    const customer = setUserDetails(req.user.dataValues);
+    const customer = req.customer || setUserDetails(req.user.dataValues);
     Response.success({ req,
       res,
       statusCode: 200,

@@ -24,10 +24,10 @@ const mockConfirmEmailHash = Helpers.hashPassword('asdfghjkl;');
 const mockConfirmEmailToken = Helpers.generateTimedToken(mockConfirmEmailHash,
   60 * 60 * 2);
 
-const registrationURL = '/customer/register';
-const resendConfirmationEmailUrl = '/resend-confirmation-emails';
-const invalidEmailConfirmationURL = '/email-confirmation?email=mcemie4eva@gmail.com&token=invalidToken';
-const emailConfirmationURL = `/email-confirmation?email=mcemie4eva@gmail.com&token=${mockConfirmEmailToken}`;
+const registrationURL = '/api/v1/customer/register';
+const resendConfirmationEmailUrl = '/api/v1/resend-confirmation-emails';
+const invalidEmailConfirmationURL = '/api/v1/email-confirmation?email=mcemie4eva@gmail.com&token=invalidToken';
+const emailConfirmationURL = `/api/v1/email-confirmation?email=mcemie4eva@gmail.com&token=${mockConfirmEmailToken}`;
 let uniqueToken;
 let userToken;
 
@@ -194,7 +194,7 @@ describe('Test the email confirmation URL route', () => {
   it('should return a 200 if the email confirmation url is valid', (done) => {
     const hash = Helpers.hashPassword(uniqueToken);
     const token = Helpers.generateTimedToken(hash, 60 * 60 * 2);
-    const validEmailConfirmationURL = `/email-confirmation?email=mcemie4eva@gmail.com&token=${token}`;
+    const validEmailConfirmationURL = `/api/v1/email-confirmation?email=mcemie4eva@gmail.com&token=${token}`;
     chai
       .request(app)
       .get(validEmailConfirmationURL)
@@ -209,7 +209,7 @@ describe('Test the email confirmation URL route', () => {
   it('should return a 400 if the email has already being confirmed', (done) => {
     const hash = Helpers.hashPassword(uniqueToken);
     const token = Helpers.generateTimedToken(hash, 60 * 60 * 2);
-    const validEmailConfirmationURL = `/email-confirmation?email=mcemie4eva@gmail.com&token=${token}`;
+    const validEmailConfirmationURL = `/api/v1/email-confirmation?email=mcemie4eva@gmail.com&token=${token}`;
     chai
       .request(app)
       .get(validEmailConfirmationURL)
@@ -224,7 +224,7 @@ describe('Test the email confirmation URL route', () => {
   it('should return a 404 if the email is not found on the database', (done) => {
     const hash = Helpers.hashPassword(uniqueToken);
     const token = Helpers.generateTimedToken(hash, 60 * 60 * 2);
-    const validEmailConfirmationURL = `/email-confirmation?email=fakeuser@yahoo.com&token=${token}`;
+    const validEmailConfirmationURL = `/api/v1/email-confirmation?email=fakeuser@yahoo.com&token=${token}`;
     chai
       .request(app)
       .get(validEmailConfirmationURL)

@@ -5,7 +5,7 @@ import app from '../server/app';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-const departmentsEndpoint = '/departments';
+const departmentsEndpoint = '/api/v1/departments';
 
 describe('Test the get all departments route', () => {
   it('should get all departments', (done) => {

@@ -1,11 +1,16 @@
 import '@babel/polyfill';
 import express from 'express';
 import bodyParser from 'body-parser';
+import passport from 'passport';
 import logger from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
+import { Response } from './utils';
+import wildcards from './routes/wildCardRoutes';
 import routes from './routes';
+
+const { log } = console;
 
 const apiVersion = '/api/v1';
 
@@ -20,7 +25,7 @@ app.use(helmet());
 // Enable CORS
 app.use(cors());
 
-// Log requests to the console.
+// Log requests to the console
 app.use(logger('dev'));
 
 // Parse incoming requests data
@@ -28,17 +33,27 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: 'application/json' }));
 app.use(bodyParser.text());
 
+// Initializing Passport
+app.use(passport.initialize());
+
 // Routes
 app.use(apiVersion, routes);
 
-// catch index and catch all null routes
-app.use(routes);
+// catch index route
+app.get('/', (req, res) => Response.success({
+  req,
+  res,
+  statusCode: 200,
+  data: { message: 'Welcome to Shoplink' }
+}));
+
+// catch all non-exixtent routes
+app.use(wildcards);
 
 // Set Port
 const port = process.env.PORT;
 
-const { log } = console;
 
-app.listen(port, () => log('Server running on port', port));
+app.listen(port, () => log(`🔌 Connected on port ${port}`));
 
 export default app;

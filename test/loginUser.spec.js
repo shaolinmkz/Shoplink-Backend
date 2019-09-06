@@ -10,7 +10,7 @@ const mockUser = {
   password: 'mockpassword12345;'
 };
 
-const loginEndpoint = '/customer/login';
+const loginEndpoint = '/api/v1/customer/login';
 
 describe('Test the login route', () => {
   it('should login a user', (done) => {
