@@ -1,5 +1,5 @@
 import express from 'express';
-import { Users } from '../controller/index';
+import { Users } from '../controller';
 import { ValidateUser, captureErrors, nameValidator, validateEmail, validatePassword } from '../middleware';
 
 const customer = express.Router();
