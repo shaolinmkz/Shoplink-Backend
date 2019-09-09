@@ -3,7 +3,7 @@ import { v4 as generateId } from 'uuid';
 
 dotenv.config();
 
-const defaultProfileImage = process.env.DEFAULT_PROFILE_IMAGE;
+const { DEFAULT_PROFILE_IMAGE: defaultProfileImage, USER_ROLE_ID } = process.env;
 
 export default {
   up: (queryInterface, Sequelize) => queryInterface.createTable('Users', {
@@ -81,6 +81,15 @@ export default {
       values: ['user', 'admin', 'super-admin'],
       allowNull: false,
       defaultValue: 'user',
+    },
+    roleId: {
+      type: Sequelize.UUID,
+      allowNull: false,
+      defaultValue: USER_ROLE_ID,
+      references: {
+        model: 'Roles',
+        key: 'id'
+      }
     },
     uniqueToken: {
       type: Sequelize.TEXT,

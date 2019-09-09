@@ -19,15 +19,13 @@ export default class FindOneOrAll {
   }
 
   /**
-   * @method findAll
-   * @description find one
+   * @method findAndCountAll
+   * @description find and counts all
    * @param {object} model the data store model
-   * @param {object} params - the filter parameters
-   * @param {object} include - the excluded attributes
-   * @param {object} exclude - the include attributes
+   * @param {object} options - the filter parameters
    * @returns {function} the function to be called eventually
    */
-  static async findAll(model, params = {}, include = [], exclude = []) {
-    return await db[model].findAll({ where: { ...params }, attributes: { include, exclude } });
+  static async findAndCountAll(model, options) {
+    return await db[model].findAndCountAll({ ...options });
   }
 }

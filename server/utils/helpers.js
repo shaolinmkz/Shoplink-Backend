@@ -155,4 +155,27 @@ export default class Helpers {
       callback(null, { data: { displayName, photos, emails } });
     });
   }
+
+  /**
+   * @method formatPaginatedData
+   * @description extract and format user details via facebook auth
+   * @param {object} data
+   * @param {string} title
+   * @returns {object} an object
+   */
+  static formatPaginatedData({ offset, limit, count, rows }, title) {
+    const totalPages = Math.ceil(count / limit);
+    const currentPage = Math.ceil(offset / limit) + 1;
+    const pageSize = rows.length;
+
+    return {
+      [title]: rows,
+      pagination: {
+        totalPages,
+        currentPage,
+        pageSize,
+        totalRecords: count
+      }
+    };
+  }
 }
