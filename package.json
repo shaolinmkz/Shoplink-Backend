@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node ./dist/app.js",
     "dev": "nodemon --exec babel-node ./server/app.js",
-    "test": "npm run reset:db && nyc --reporter=html --reporter=text mocha --require @babel/polyfill --require @babel/register ./test/index.spec.js --timeout 10000 --exit",
-    "lint": "eslint ./server --fix",
+    "test": "npm run reset:db && nyc --reporter=html --reporter=text mocha --require @babel/polyfill --require @babel/register ./server/api/v1/test/index.spec.js --timeout 10000 --exit",
+    "lint": "eslint ./server/api/v1 --fix",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "sequelize": "./node_modules/.bin/babel-node ./node_modules/.bin/sequelize $*",
     "migrate": "./node_modules/.bin/babel-node ./node_modules/.bin/sequelize db:migrate",
@@ -15,9 +15,9 @@
     "reset:migration": "npm run sequelize db:migrate:undo:all && npm run sequelize db:migrate",
     "reset:db": "npm run reset:migration && npm run reset:seeds",
     "start:dev": "npm run reset:db && npm run dev",
-    "build": "npm run reset:db && rm -rf dist && mkdir dist && babel -d ./dist ./server -s",
+    "build": "npm run reset:db && rm -rf dist && mkdir dist && babel -d ./dist ./server/ -s",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run build",
-    "coverage": "nyc --reporter=html --reporter=text --reporter=lcov mocha --reporter spec --require babel-register ./test/*.js --exit"
+    "coverage": "nyc --reporter=html --reporter=text --reporter=lcov mocha --reporter spec --require babel-register ./server/api/v1/test/*.js --exit"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { NodeMailerService } from '../server/utils';
+import { NodeMailerService } from '../utils';
 
 const { expect } = chai;
 

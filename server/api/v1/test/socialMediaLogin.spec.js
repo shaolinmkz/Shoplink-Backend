@@ -1,10 +1,10 @@
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import MockStrategy from 'passport-mock-strategy';
-import app from '../server/app';
-import passport from '../server/socialMediaAuth/config';
-import { Helpers } from '../server/utils';
-import { ValidateUser } from '../server/middleware';
+import app from '../../../app';
+import passport from '../socialMediaAuth/config';
+import { Helpers } from '../utils';
+import { ValidateUser } from '../middleware';
 
 const { verifySocialLogin } = ValidateUser;
 

@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { Helpers } from '../server/utils';
+import { Helpers } from '../utils';
 
 const { expect } = chai;
 
