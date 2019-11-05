@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git+https://github.com/shaolinmkz/Shoplink-Backend.git"
   },
-  "author": "shaolinmkz et Kleva-j",
+  "author": "shaolinmkz",
   "lint-staged": {
     "*.js": [
       "eslint --fix",
