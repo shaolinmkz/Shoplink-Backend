@@ -15,7 +15,7 @@ describe('Test the wild card routes ', () => {
         expect(res.status).to.equal(200);
         expect(status).to.equal('success');
         expect(method).to.equal('GET');
-        expect(message).to.equal('Welcome to Welcome to Shoplink');
+        expect(message).to.equal('Welcome to Shoplink');
         done(req);
       });
   });
