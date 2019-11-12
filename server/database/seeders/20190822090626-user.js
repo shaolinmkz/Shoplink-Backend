@@ -9,7 +9,8 @@ const {
   ADMIN_TWO_PASSWORD,
   DEFAULT_PROFILE_IMAGE,
   ADMIN_ONE_EMAIL,
-  ADMIN_TWO_EMAIL
+  ADMIN_TWO_EMAIL,
+  SUPER_ADMIN_ROLE_ID
 } = process.env;
 
 export default {
@@ -31,6 +32,7 @@ export default {
     profileImage: DEFAULT_PROFILE_IMAGE,
     isAdmin: true,
     role: 'super-admin',
+    roleId: SUPER_ADMIN_ROLE_ID,
     uniqueToken: 'n/a',
     isEmailVerified: true,
     createdAt: Sequelize.literal('NOW()'),
@@ -54,6 +56,7 @@ export default {
     profileImage: DEFAULT_PROFILE_IMAGE,
     isAdmin: true,
     role: 'super-admin',
+    roleId: SUPER_ADMIN_ROLE_ID,
     uniqueToken: 'n/a',
     isEmailVerified: true,
     createdAt: Sequelize.literal('NOW()'),

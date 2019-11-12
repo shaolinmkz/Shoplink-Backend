@@ -1,10 +1,22 @@
 import express from 'express';
 import { Users } from '../controller';
-import { ValidateUser, captureErrors, nameValidator, validateEmail, validatePassword } from '../middleware';
+import passport from '../socialMediaAuth/config';
+import {
+  ValidateUser,
+  captureErrors,
+  nameValidator,
+  validateEmail,
+  validatePassword,
+} from '../middleware';
 
 const customer = express.Router();
 
-const { register, login, confirmEmail, resendConfirmationEmail } = Users;
+const {
+  register,
+  login,
+  confirmEmail,
+  resendConfirmationEmail,
+} = Users;
 
 const {
   existingUser,
@@ -14,6 +26,7 @@ const {
   verifyToken,
   validateUserExists,
   isEmailVerified,
+  loggedInWithSocialMedia,
 } = ValidateUser;
 
 customer.post('/customer/register',
@@ -43,7 +56,17 @@ customer.post('/customer/login',
   captureErrors,
   validateUser,
   validateUserExists,
+  loggedInWithSocialMedia,
   validateLogin,
+  login);
+
+customer.get('/customer/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+customer.get('/auth/facebook/callback',
+  ValidateUser.verifySocialLogin,
+  passport.authenticate('facebook', { session: false }),
+  ValidateUser.validateFacebookLogin,
+  ValidateUser.socialMediaSignUp,
   login);
 
 export default customer;

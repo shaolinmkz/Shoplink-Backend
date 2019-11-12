@@ -16,7 +16,7 @@ class Response {
   static success({ req, res, statusCode, data }) {
     res
       .status(statusCode)
-      .json({ method: req.method, status: 'success', ...data });
+      .json({ method: req.method, statusCode, status: 'success', ...data });
   }
 
   /**
@@ -31,7 +31,7 @@ class Response {
   static error({ req, res, statusCode, data }) {
     res
       .status(statusCode)
-      .json({ method: req.method, status: 'error', ...data });
+      .json({ method: req.method, statusCode, status: 'error', ...data });
   }
 }
 

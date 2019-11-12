@@ -1,8 +1,10 @@
+import { v4 as generateId } from 'uuid';
 import { Response, Helpers } from '../utils';
-import { FindOneOrAll } from '../services';
+import { FindOneOrAll, CreateRecord } from '../services';
 
-const { verifyToken, decryptHash } = Helpers;
+const { verifyToken, decryptHash, setUserDetails, extractUserDetails } = Helpers;
 const { findOne } = FindOneOrAll;
+const { createRecord } = CreateRecord;
 
 /**
  * @class ValidateUser
@@ -28,6 +30,80 @@ export default class ValidateUser {
   }
 
   /**
+   * @method validateFacebookLogin
+   * @description function to attach a user to the request body
+   * @param {object} req - the request Object
+   * @param {object} res - the response Object
+   * @param {callback} next - the next middleware
+   * @returns {boolean} whether the user is unique and exist
+   */
+  static async validateFacebookLogin(req, res, next) {
+    const { user: { data: { emails, displayName, photos } } } = req;
+    const params = { email: emails[0].value };
+    try {
+      const socialMediaUser = await findOne('User', params);
+      if (socialMediaUser) {
+        req.user = socialMediaUser.dataValues;
+      } else {
+        req.user = extractUserDetails({ displayName, photos, emails });
+        req.newUser = true;
+      }
+      next();
+    } catch (error) {
+      return Response.error({ req, res, statusCode: 500, data: { error } });
+    }
+  }
+
+  /**
+   * @description signUp users with social media
+   * @method socialMediaSignUp
+   * @param {object} req - request object
+   * @param {object} res - response object
+   * @param {callback} next - the next middleware
+   * @return {undefined}
+   */
+  static async socialMediaSignUp(req, res, next) {
+    try {
+      req.customer = setUserDetails(req.user);
+      if (req.newUser) {
+        const id = generateId();
+        const { firstName, lastName, email, profileImage } = req.user;
+        const inputs = {
+          firstName,
+          lastName,
+          email,
+          isSocialMediaAuth: true,
+          isEmailVerified: true,
+          profileImage
+        };
+        const createUser = await createRecord('User', { id, ...inputs });
+        req.customer = setUserDetails(createUser.dataValues);
+      }
+      next();
+    } catch (error) {
+      return Response.error({ req, res, statusCode: 500, data: { error } });
+    }
+  }
+
+  /**
+   * @method verifySocialLogin
+   * @description Verifies that the user granted the platform access to their data
+   * @param {object} req - The Request Object
+   * @param {object} res - The Response Object
+   * @param {callback} next - Callback method
+   * @returns {undefined}
+   */
+  static async verifySocialLogin(req, res, next) {
+    const { query } = req;
+    const { error, denied } = query;
+    if (error || denied) {
+      Response.error({ req, res, statusCode: 401, data: { error } });
+    } else {
+      next();
+    }
+  }
+
+  /**
    * @method validateUser
    * @description validates a user exist
    * @param {object} req - the request Object
@@ -46,6 +122,23 @@ export default class ValidateUser {
       next();
     } catch (error) {
       return Response.error({ req, res, statusCode: 500, data: { error } });
+    }
+  }
+
+  /**
+   * @method loggedInWithSocialMedia
+   * @description validates a user exist
+   * @param {object} req - the request Object
+   * @param {object} res - the response Object
+   * @param {function} next - the next middleware
+   * @returns {boolean} whether the user is unique and exist
+   */
+  static async loggedInWithSocialMedia(req, res, next) {
+    const { user: { dataValues } } = req;
+    if (dataValues.isSocialMediaAuth) {
+      Response.error({ req, res, statusCode: 401, data: { message: 'This email is registered with a social media login' } });
+    } else {
+      next();
     }
   }
 
@@ -94,11 +187,13 @@ export default class ValidateUser {
    * @returns {undefined}
    */
   static validateLogin(req, res, next) {
-    const loginUser = req.user;
-    const isPasswordCorrect = decryptHash(req.body.password, loginUser.password);
+    const hash = req.user.password;
+    const isPasswordCorrect = decryptHash(req.body.password, hash);
     if (isPasswordCorrect) {
       next();
-    } else Response.error({ req, res, statusCode: 401, data: { message: 'Wrong email or password.' } });
+    } else {
+      Response.error({ req, res, statusCode: 401, data: { message: 'Wrong email or password.' } });
+    }
   }
 
   /**

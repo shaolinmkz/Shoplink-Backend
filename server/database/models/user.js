@@ -4,6 +4,7 @@ dotenv.config();
 
 const { DEFAULT_PROFILE_IMAGE } = process.env;
 
+
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     firstName: {
@@ -21,10 +22,13 @@ export default (sequelize, DataTypes) => {
         args: true,
         msg: 'email already exists',
       },
+      validate: {
+        isEmail: true,
+      }
     },
     password: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     address1: {
       type: DataTypes.TEXT,
@@ -96,10 +100,17 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false
-    }
+    },
+    isSocialMediaAuth: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
+    },
   }, {});
-  User.associate = () => {
-    // associations can be defined here
+  User.associate = (models) => {
+    User.belongsTo(models.Role, {
+      foreignKey: 'roleId'
+    });
   };
   return User;
 };

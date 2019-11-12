@@ -1,7 +1,14 @@
 import { Response } from '../utils';
 import { FindOneOrAll } from '../services';
+import Helpers from '../utils/helpers';
 
-const { findAll } = FindOneOrAll;
+const {
+  findAndCountAll
+} = FindOneOrAll;
+
+const {
+  formatPaginatedData
+} = Helpers;
 
 /**
  * @class Departments
@@ -17,12 +24,17 @@ export default class Departments {
    */
   static async getAllDeparments(req, res) {
     try {
-      const departments = await findAll('Department', {}, [], ['createdAt', 'updatedAt']);
+      let { limit, offset } = req.query;
+      offset = Number(offset) || 0;
+      limit = Number(limit) || 10;
+      const departments = await findAndCountAll('Department', { offset, limit });
+      const formattedData = formatPaginatedData({ offset, limit, ...departments }, 'departments');
+
       Response.success({ req,
         res,
         statusCode: 200,
         data: {
-          departments
+          data: formattedData
         }
       });
     } catch (error) {

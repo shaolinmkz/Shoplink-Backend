@@ -4,8 +4,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING
     }
   }, {});
-  Role.associate = () => {
-    // associations can be defined here
+  Role.associate = (models) => {
+    Role.hasMany(models.User, {
+      foreignKey: 'roleId'
+    });
   };
   return Role;
 };
